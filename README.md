@@ -49,11 +49,11 @@ Describing the Memory Layout in Rust Language
 - In a **64-bits** processor the `word` size is **64/8 or 8 bytes**.
 - A **32-bits** processor can only address up to **2^32 or ~4GB** of [byte-addressable](https://en.wikipedia.org/wiki/Byte_addressing) memory. On the other hand **64-bits** processor can address from **0 to 2^64-1 or 16 billion GB**. Filling up the total memory is equivalent to turn every **0 bit into 1**
 - On **64-bits** `CPU` only **48-bits or ~281TB** is used for memory addressing with the remaining **16 bits** of the virtual address required to be all 0's or all 1's.
-- Using the above as example only **1-bit or ~141TB** is used for `kernelspace` and the rest is used for `userspace` memory.
+- Using the above as reference only **1-bit or ~141TB** is used for `kernelspace` and the rest is used for `userspace` memory.
 
 # [Text Segment](#text-segment)
 
-- The text segment, aka code segment, is where the Rust code is compiled by LLVM into machine code and then execute instructions
+- The text segment, aka **code segment**, is where the **Rust** code is compiled by LLVM into machine code and then execute instructions
 
 # [Data Segment](#data-segment)
 
@@ -102,13 +102,13 @@ fn double(n: i32) -> i32 {
 
 # [STACK](#stack) Properties
 
-- The `stack` is a **static memory** that requires a **fixed known size** at compile time and is stored inside the binary after compilation.
-- The `stack` memory **grows downwards** starting from a [higher address](#high-memory-address) of around `0x7fffffffffff`.
+- The `Stack` is a **static memory** that requires a **fixed known size** at compile time and is stored inside the binary after compilation.
+- The `Stack` memory **grows downwards** starting from a [higher address](#high-memory-address) of around `0x7fffffffffff`.
 - It is an **abstraction concept** that creates **processes/threads** and is very common to find in almost every program.
 - Each process starts a **single thread by default** and each process has it's **own separate stack**.
-- Rust `stack` size limit is **8MB** in a **64-bit** system but the default **start size is 2MB**.
+- Rust `Stack` size limit is **8MB** in a **64-bit** system but the default **start size is 2MB**.
 - If your executition exceeds the stack limit you will be confronted with a **"stack overflow"** compile error.
-- The stack **pointer size** is determined its **data type**. In this case `i32` needs **4 bytes** and `i64` needs **8 bytes**.
+- The stack **pointer size** is determined by its **data type**. In this case `i32` needs **4 bytes** and `i64` needs **8 bytes**.
 - Because of it's **static** nature it doesn't need any additional step to change it's size using system calls which **speeds up the execution**.
 
   </td>
@@ -117,13 +117,13 @@ fn double(n: i32) -> i32 {
 
 🦀 **Depicting the memory allocation:**
 
-1.  A `Stack Frame` is created and a `stack pointer` **increases by 8 bytes (for a 64-bit OS)** to keep track of the running program. The `main()` has a local variable `a` which is a `i32` so its `4 bytes` in size to be reserved in its `Stack Frame`.
+1.  A `Stack Frame` is created and a **stack pointer increases by 8 bytes (for a 64-bit OS)** to keep track of the running program. The `main()` has a local variable `a` which is a `i32` so its `4 bytes` in size to be reserved in its `Stack Frame`.
 
-2.  Next the variable `b` calls the function `double()` which creates another `Stack Frame` and the `stack pointer` **increases 8 bytes** in its own `Stack Frame`.
+2.  Next the variable `b` calls the function `double()` which creates another `Stack Frame` and the **\*stack pointer increases 8 bytes** in its own `Stack Frame`.
 
-3.  In `double()` function the parameter `n` is a `i32` so it needs another `4 bytes` to be added on its own `Stack Frame`. The `double()` function run and returns a value. The `double()` function has a **return address** to be stored in the variable `b` inside `main()` and its a `i32` so another `4 bytes` again. The function is terminated and the **stack pointer decreases 8 bytes** deallocating `double()` to be **overwritten by another function in the future**.
+3.  In `double()` function the parameter `n` is a `i32` so it needs another `4 bytes` to be added on its own `Stack Frame`. The `double()` function has a **return address** to be stored in the variable `b` inside `main()` and its a `i32` so another `4 bytes` added. The function is terminated and the **stack pointer decreases 8 bytes** deallocating `double()` to be **overwritten by another function in the future**.
 
-4.  The **stack pointer** back to `main()` function and the variable `b` **receives the value returned** from `double()`, the `main()` function ends and the whole program terminates.
+4.  The **stack pointer** goes back to `main()` function and the variable `b` **receives the value returned** from `double()`, the `main()` function ends and the whole program terminates.
 
 <br><br><br>
 
@@ -161,15 +161,16 @@ fn boxed_value() -> Box<i32> {
 
 # [HEAP](#heap) Properties
 
-- The `heap` is another abstraction that, unlike `stack`, has a **flexible size** that can change over time (like in **run time**).
-- Instead of one `Stack Frame` for each thread the `heap` memory region has a large **shared memory with the `stack` memory region**.
-- The `heap` memory **grows upwards** starting from the [lower address](#low-memory-address).
-- While the program is running the `heap` memory region **grows and shrinks** as needed.
-- The `heap` is **not stored** inside the binary and is discarded after the program execution.
-- Its size limit is bounded the system's memory.
-- Each `heap` **value size** is determined by the **data type**.
-- Because of it's **dyanmic** nature it needs to make system calls to ask for more space (using the **GlobalAlloc Trait that calls C malloc**) as soon as requested thus adding a little overhead. This process is done in **chunks to make the fewer system calls as possible**. Even using this technique this process turns the `heap` slower than the `stack` memory.
+- The `Heap` is another abstraction that, unlike `Stack`, has a **flexible size** that can change over time (like in **run time**).
+- Instead of one `Stack Frame` for each thread the `Heap` memory region has a large **shared memory with the `Stack` memory region**.
+- The `Heap` memory **grows upwards** starting from the [lower address](#low-memory-address).
+- While the program is running the `Heap` memory region **grows and shrinks** as needed.
+- The `Heap` is **not stored** inside the binary and is discarded after the program execution.
+- Its size limit is bounded by the system's memory.
+- Each `Heap` **value size** is determined by the **data type**.
+- Because of it's **dyanmic** nature it needs to make system calls to ask for more space (using the **GlobalAlloc Trait that calls C malloc**) as soon as requested thus adding a little overhead. This process is done in **chunks to make the fewer system calls as possible**. Even using this technique this process turns the `Heap` slower than the `Stack` memory.
 - The memory allocator keeps track of the **OS memory pages** to know which pages are **free** and which are **allocated**. This process is a way to **prevent more system calls** and **reuse** the avaible memory without waiting for the OS thus speeding things up.
+- The access to the `Heap` is also slower than on the `Stack` because we have the addiotional step of **following a pointer** to the value.
 
   </td>
   </tr>
@@ -177,11 +178,11 @@ fn boxed_value() -> Box<i32> {
 
 🦀 **Depicting the memory allocation:**
 
-1.  The `main()` function creates a new `Stack Frame`. The **stack pointer increases 8 bytes** and the variable `heap` calls the function `boxed_value()`.
+1.  The `main()` function creates a new `Stack Frame`. The **stack pointer increases 8 bytes** and the variable `Heap` calls the function `boxed_value()`.
 
-2.  In the `boxed_value()` the **stack pointer increses 8 bytes again** and we also have a local variable called `result` that has a `Box` with a value inside. The **`Box` acts as a pointer** so the return value size is **8 bytes** as well (the `heap` variable in `main()` will be the same **8 bytes but as an address pointing to the `Heap Memory`**). Inside the `Box` we have a value `99` which is `i32` so we need to reserve **4 bytes but this time on the heap**. The function ends, **deallocates and decrases the stack pointer by 8 bytes**.
+2.  The `boxed_value()` the **stack pointer increses 8 bytes again** and we also have a local variable called `result` that has a `Box` with a value inside. The **`Box` acts as a pointer** so the return value size is **8 bytes** as well (the `Heap` variable in `main()` will be the same **8 bytes but as an address pointing to the `Heap Memory`**). Inside the `Box` we have a `99` value which is a `i32` so we need to reserve **4 bytes but this time on the heap**. The function ends, **deallocates and decreases the stack pointer by 8 bytes**.
 
-3.  The **pointer** back to the `main()` and the **heap variable** now receives a **copied address** of the value stored in the shared `Heap Memory`. Finally the funtion runs and terminates the program.
+3.  The **pointer** goes back to the `main()` and the **heap variable** now receives a **copied address** of the value stored in the shared `Heap Memory`. Finally the funtion runs and terminates the program.
 
 # [DATA TYPES](#data-types)
 
@@ -262,17 +263,17 @@ fn boxed_value() -> Box<i32> {
 
   <td width="70%">
 
-# Properties
+# [TYPE](#type) Properties
 
 - **Signed Integers** and **Unsigned Integers** have **known sizes** at compile time so they can be stored fully in the `Stack` memory region.
 - `isize` and `usize` are machine words of **4 bytes or 8 bytes (32 or 64 bits, respectively)** that depends on the **OS architecture**.
 - The `char` type stores [UNICODE](#unicode) characters with a size of **4 bytes** .
-- `Tuple` type can store **multiple other types** in the `Stack` memory region. If multiple type sizes inside a `Tuple` is less than the `Stack` memory size avaiable then a **padding will fill the remaining space** (use the `std::mem::size_of::<T>()` and `std::mem::align_of::<T>()` to understand how this better).
+- `Tuple` type can store **multiple other types** in the `Stack` memory region. If multiple type sizes inside a `Tuple` is less than the memory allocated then a **padding will fill the remaining space** (use the `Std::mem::size_of::<T>()` and `Std::mem::align_of::<T>()` to check the size and alignment of types).
 - The `Array` holds a **known fixed size** of **multiple values of the same type** in the `Stack` memory region.
-- **Floating point numbers** are **stored in **IEEE 754\*\* format.
-- **Booleans** are **stored as **1 byte\*\*.
+- **Floating point numbers** are stored in **IEEE 754** format and their sizes are **4 bytes** for `f32` and **8 bytes** for `f64`.
+- **Booleans** are stored as **1 byte**.
 
-- The `Vector` type is a **dynamic array** that can **grow and shrink** as needed. The size of the `Vector` is **not known** at compile time thus the `Vector` is allocated in the `Heap` memory region. To keep track of the `Vector` value inside the `Heap` we need to store the `Vector` in the `Stack` using 3 machine words:
+- The `Vector` type is a **dynamic array** that can **grow and shrink** as needed. The size of the `Vector` is **not known** at compile time thus the `Vector` is allocated on the `Heap` memory region. To keep track of the `Vector` value inside the `Heap` we need to store the `Vector` in the `Stack` using 3 machine words:
 
 <div align=center>
 
@@ -281,7 +282,7 @@ fn boxed_value() -> Box<i32> {
 
 </div>
 
-1.  The first word stores the **address** of the `Vector` in the `Heap` memory region.
+1.  The first word is a **pointer** and stores the **address** of the `Vector` in the `Heap` memory region.
 2.  The second word stores the **capacity** of the `Vector` (the maximum number of elements that can be stored in the `Vector`).
 3.  The third word stores the **length** of the `Vector` (the number of elements that are currently stored in the `Vector`).
 
@@ -289,9 +290,9 @@ fn boxed_value() -> Box<i32> {
 >
 > When the `Vector` overeaches its capacity then it will **grow** the `Vector` by **adding a new chunk of memory (using malloc)** to the `Heap` memory region then **copy the old values** to the new chunk of memory and finally update the **pointer** to the new avaiable space.
 
-- `Strings` are actually `Vectors` and are stored in the `Heap` memory region as **a sequence of bytes `UTF-8` encoded**. `String Slice` or `&str` on the other hand are stored in the `Stack` memory region and have a `static` lifetime which means it'll be stored in the **binary** file and last throughout the program execution.
+- `Strings` are actually `Vectors` and are stored in the `Heap` memory region as **a sequence of bytes `UTF-8` encoded**. `String Slice` or `&str` on the other hand are stored in the `Stack` memory region and have a `Static` lifetime which means it'll be stored in the **binary** file and last throughout the program execution.
 - The `Struct` comes in 3 kinds: `Struct` with **named fields**, **Tuple like** `Struct` and **Unit like** `Struct`. Tuple like `Structs` and named fields `Structs` act similar to a `Tuple` type. **Unit like** `Structs` **doesn't hold any data (0 bit)** and is useful for classifing without using memory.
-- The `Enum` type has fields called **variants**. If a variant doesn't hold any value they are stored in the `Stack` memory region as **a sequence of integers starting from 0**. `Enums` with variant values has their size defined by the **largest variant value** and this value will be used as the size of each variant. To reduce the memory used by `Enums` you can try to use a `Box<T>` to store the variant value in the `Heap` memory region.
+- The `Enum` type has fields called **variants**. If a variant doesn't hold any value they are stored in the `Stack` memory region as **a sequence of integers starting from 0**. `Enums` with variant values have their sizes defined by the **largest variant value** and this value will be used as the size of each variant. To reduce the memory used by `Enums` you can try to use a `Box<T>` to store the variant value in the `Heap` memory region.
 
 ## [REFERENCE](#reference) and [SLICE](#slice) Type
 

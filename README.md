@@ -49,7 +49,7 @@ Describing the Memory Layout in Rust Language
 - In a **64-bits** processor the `word` size is **64 ÷ 8 or 8 bytes**.
 - A **32-bits** processor can only address up to **2^32 or ~4GB** of [byte-addressable](https://en.wikipedia.org/wiki/Byte_addressing) memory. On the other hand **64-bits** processor can address from **0 to 2^64-1 or 16 billion GB**. Filling up the total memory is equivalent to turn every **0 bit into 1**
 - On **64-bits** `CPU` only **48-bits or ~281TB** is used for memory addressing with the remaining **16 bits** of the virtual address required to be all 0's or all 1's.
-- Using the above as reference only **1-bit or ~141TB** is used for `kernelspace` and the rest is used for `userspace` memory.
+- Using the above as reference only **1-bit** is used for `kernelspace` and the rest is used for `userspace` memory.
 
 # [Text Segment](#text-segment)
 

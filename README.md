@@ -45,8 +45,8 @@ Describing the Memory Layout in Rust Language
 
 ### Basic x86-64 Linux ELF Binary
 
-- The memory address range is bounded the the `word` size of the `CPU`.
-- In a **64-bits** processor the `word` size is **64/8 or 8 bytes**.
+- The memory address range is bounded by the `word` size of the `CPU`.
+- In a **64-bits** processor the `word` size is **64 ÷ 8 or 8 bytes**.
 - A **32-bits** processor can only address up to **2^32 or ~4GB** of [byte-addressable](https://en.wikipedia.org/wiki/Byte_addressing) memory. On the other hand **64-bits** processor can address from **0 to 2^64-1 or 16 billion GB**. Filling up the total memory is equivalent to turn every **0 bit into 1**
 - On **64-bits** `CPU` only **48-bits or ~281TB** is used for memory addressing with the remaining **16 bits** of the virtual address required to be all 0's or all 1's.
 - Using the above as reference only **1-bit or ~141TB** is used for `kernelspace` and the rest is used for `userspace` memory.
@@ -266,7 +266,7 @@ fn boxed_value() -> Box<i32> {
 # [TYPE](#type) Properties
 
 - **Signed Integers** and **Unsigned Integers** have **known sizes** at compile time so they can be stored fully in the `Stack` memory region.
-- `isize` and `usize` are machine words of **4 bytes or 8 bytes (32 or 64 bits, respectively)** that depends on the **OS architecture**.
+- `isize` and `usize` are machine words of **4 bytes or 8 bytes (32 or 64-bits, respectively)** that depends on the **OS architecture**.
 - The `char` type stores [UNICODE](#unicode) characters with a size of **4 bytes** .
 - `Tuple` type can store **multiple other types** in the `Stack` memory region. If multiple type sizes inside a `Tuple` is less than the memory allocated then a **padding will fill the remaining space** (use the `Std::mem::size_of::<T>()` and `Std::mem::align_of::<T>()` to check the size and alignment of types).
 - The `Array` holds a **known fixed size** of **multiple values of the same type** in the `Stack` memory region.

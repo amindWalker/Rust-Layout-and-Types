@@ -4,7 +4,7 @@
 
 # Rust Memory Layout
 
-Describing the Memory Layout for each Type in Rust Language
+Detailing the Memory Layout behind the Rust Language
 
 <br><br><br>
 
@@ -289,12 +289,18 @@ fn boxed_value() -> Box<i32> {
 
 - `Strings` are much like `Vectors` but are stored in the `Heap` memory region as **a sequence of bytes `UTF-8` encoded** and because of that you **can't rely to access using [] indexing**. To access `Strings` reliably use **range slicing &[..]** to return a `String Slice`. A `String Slice` or `&str` on the other hand are stored in the `Stack` memory region and have a `static` lifetime which means it'll be stored in the **binary** file and last throughout the program execution.
 - The `Struct` comes in 3 kinds: `Struct` with **named fields**, **Tuple like** `Struct` and **Unit like** `Struct`. Tuple like `Structs` and named fields `Structs` act similar to a `Tuple` type but have more **meaningful information about your data** so your code becomes organized or **structured**. **Unit like** `Structs` **doesn't hold any data (0 bit)** and is useful for classifing without using memory.
-- The `Enum` type has fields called **variants**. If a variant doesn't hold any value they are stored in the `Stack` memory region as **a sequence of integers starting from 0**. `Enums` with variant values have their sizes defined by the **largest variant value** and this value will be used as the size of each variant. To reduce the memory used by `Enums` you can try to use a `Box<T>` to store the variant value in the `Heap` memory region.
+- The `Enum` type has fields called **variants**. If a variant doesn't hold any value they are stored in the `Stack` memory region as **a sequence of integers starting from 0**. `Enums` with variant values have their sizes defined by the **largest variant value** and this value will be used as the size of each variant. To reduce the memory used by `Enums` you can try to wrap the largest variant inside a `Box<T>` and the `Box<T>` will act as **buffer** to stream data from the `Heap` to the `Stack` memory region. `Option Enum` befits from using `Box<T>`. `None` will be 0 and `Some` **points to the data**. Both without **integer tags** so it's **more memory efficient**.
 
 ## [REFERENCE](#reference) and [SLICE](#slice) Type
 
 - The `Reference` type is a **pointer (8 or 4 bytes OS dependent)** to a type that is allocated either on the `Stack` or the `Heap` memory region. It is stored on the `Stack` and is respresented by the `&T` syntax using 2 machine words, one for the starting **address** and another for its **length**.
 - The `Slice` type is a **slice (or a view)** of an `Array` or `Vector` that can **only be read**. It acts like a **pointer** but needs an additional **length** machine word to know how many elements to read. This kind of pointer is also known as **fat pointer**. `Strings` can also be **sliced** using the `Slice` type becoming a `String Slice` or `&str` and **stored on the `Stack`**.
+
+## [SMART POINTERS](#smart-pointers)
+
+- `Rc` (Reference Counting) is a **smart pointer** that enables **read-only shared ownership of the same value**. It **increases the reference count** of the data it points to using `.clone()` and **decreases the reference count** when all the **references goes out of scope**.
+- `Arc` (Atomic Reference Counting) is a **smart pointer** that enables **read-write shared ownership of the same value**. It doesn't enable **mutability** by default but it can be enabled by wrapping the type inside a `Mutex` i.e. `Arc<Mutx<i32>>`. To be able to write to the data it needs to be **locked** using `Mutex::lock()` and **unlocked** using `Mutex::unlock()` so it can be safely read and written by other threads.
+- `Trait Objects` are references to a `Trait` type commonly found inside smart pointers and have syntax like this: `&mut dyn Trait`. The `dyn` keyword means it has a **dynamic size**. It acts like a **fat pointer** and has 2 machine words: the **data pointer** and the **virtual table or vtable** that contains the Trait methods.
 
   </td>
   </tr>

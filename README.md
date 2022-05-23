@@ -4,7 +4,7 @@
 
 # Rust Memory Layout
 
-Describing the Memory Layout in Rust Language
+Describing the Memory Layout for each Type in Rust Language
 
 <br><br><br>
 
@@ -115,7 +115,7 @@ fn double(n: i32) -> i32 {
   </tr>
 </table>
 
-🦀 **Depicting the memory allocation:**
+🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
 
 1.  A `Stack Frame` is created and a **stack pointer increases by 8 bytes (for a 64-bit OS)** to keep track of the running program. The `main()` has a local variable `a` which is a `i32` so its `4 bytes` in size to be reserved in its `Stack Frame`.
 
@@ -164,7 +164,8 @@ fn boxed_value() -> Box<i32> {
 - The `Heap` is another abstraction that, unlike `Stack`, has a **flexible size** that can change over time (like in **run time**).
 - Instead of one `Stack Frame` for each thread the `Heap` memory region has a large **shared memory with the `Stack` memory region**.
 - The `Heap` memory **grows upwards** starting from the [lower address](#low-memory-address).
-- While the program is running the `Heap` memory region **grows and shrinks** as needed.
+- While the program is running the `Heap` memory region **grows** automatically if the allocated memory is not enough and **shrink** if intentionally requested.
+  > To optmize the amount of system calls to a minimum you can try to allocate all the memory at once in one `Vec` with enough capacity **if you know how much memory your program needs beforehand**.
 - The `Heap` is **not stored** inside the binary and is discarded after the program execution.
 - Its size limit is bounded by the system's memory.
 - Each `Heap` **value size** is determined by the **data type**.
@@ -176,7 +177,7 @@ fn boxed_value() -> Box<i32> {
   </tr>
 </table>
 
-🦀 **Depicting the memory allocation:**
+🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
 
 1.  The `main()` function creates a new `Stack Frame`. The **stack pointer increases 8 bytes** and the variable `Heap` calls the function `boxed_value()`.
 
@@ -255,10 +256,6 @@ fn boxed_value() -> Box<i32> {
 | ---------------------------------------------- |
 | <div align=center>&[i32]</div>                 |
 
-| <h4>&nbsp;[GENERIC TYPE](#generic-type)&nbsp;</h4> |
-| -------------------------------------------------- |
-| <div align=center>Type<T></div>                    |
-
   </td>
 
   <td width="70%">
@@ -269,11 +266,11 @@ fn boxed_value() -> Box<i32> {
 - `isize` and `usize` are machine words of **4 bytes or 8 bytes (32 or 64-bits, respectively)** that depends on the **OS architecture**.
 - The `char` type stores [UNICODE](#unicode) characters with a size of **4 bytes** .
 - `Tuple` type can store **multiple other types** in the `Stack` memory region. If multiple type sizes inside a `Tuple` is less than the memory allocated then a **padding will fill the remaining space** (use the `Std::mem::size_of::<T>()` and `Std::mem::align_of::<T>()` to check the size and alignment of types).
-- The `Array` holds a **known fixed size** of **multiple values of the same type** in the `Stack` memory region.
+- The `Array` holds a **known fixed size** of **multiple values of the same type (homogeneous)** in the `Stack` memory region.
 - **Floating point numbers** are stored in **IEEE 754** format and their sizes are **4 bytes** for `f32` and **8 bytes** for `f64`.
 - **Booleans** are stored as **1 byte**.
 
-- The `Vector` type is a **dynamic array** that can **grow and shrink** as needed. The size of the `Vector` is **not known** at compile time thus the `Vector` is allocated on the `Heap` memory region. To keep track of the `Vector` value inside the `Heap` we need to store the `Vector` in the `Stack` using 3 machine words:
+- The `Vector` type is a **dynamic array** that can **grow and shrink** if requested. Because it's like an `Array` it must obey the **homogeneous (same types) behavior**. The size of the `Vector` is **not known** at compile time thus the `Vector` is allocated on the `Heap` memory region. To keep track of the `Vector` value inside the `Heap` we need to store the `Vector` in the `Stack` using 3 machine words:
 
 <div align=center>
 
@@ -290,8 +287,8 @@ fn boxed_value() -> Box<i32> {
 >
 > When the `Vector` overeaches its capacity then it will **grow** the `Vector` by **adding a new chunk of memory (using malloc)** to the `Heap` memory region then **copy the old values** to the new chunk of memory and finally update the **pointer** to the new avaiable space.
 
-- `Strings` are actually `Vectors` and are stored in the `Heap` memory region as **a sequence of bytes `UTF-8` encoded**. `String Slice` or `&str` on the other hand are stored in the `Stack` memory region and have a `Static` lifetime which means it'll be stored in the **binary** file and last throughout the program execution.
-- The `Struct` comes in 3 kinds: `Struct` with **named fields**, **Tuple like** `Struct` and **Unit like** `Struct`. Tuple like `Structs` and named fields `Structs` act similar to a `Tuple` type. **Unit like** `Structs` **doesn't hold any data (0 bit)** and is useful for classifing without using memory.
+- `Strings` are much like `Vectors` but are stored in the `Heap` memory region as **a sequence of bytes `UTF-8` encoded** and because of that you **can't rely to access using [] indexing**. To access `Strings` reliably use **range slicing &[..]** to return a `String Slice`. A `String Slice` or `&str` on the other hand are stored in the `Stack` memory region and have a `static` lifetime which means it'll be stored in the **binary** file and last throughout the program execution.
+- The `Struct` comes in 3 kinds: `Struct` with **named fields**, **Tuple like** `Struct` and **Unit like** `Struct`. Tuple like `Structs` and named fields `Structs` act similar to a `Tuple` type but have more **meaningful information about your data** so your code becomes organized or **structured**. **Unit like** `Structs` **doesn't hold any data (0 bit)** and is useful for classifing without using memory.
 - The `Enum` type has fields called **variants**. If a variant doesn't hold any value they are stored in the `Stack` memory region as **a sequence of integers starting from 0**. `Enums` with variant values have their sizes defined by the **largest variant value** and this value will be used as the size of each variant. To reduce the memory used by `Enums` you can try to use a `Box<T>` to store the variant value in the `Heap` memory region.
 
 ## [REFERENCE](#reference) and [SLICE](#slice) Type

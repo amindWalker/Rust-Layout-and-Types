@@ -164,7 +164,7 @@ fn boxed_value() -> Box<i32> {
 - The `Heap` is another abstraction that, unlike `Stack`, has a **flexible size** that can change over time (like in **run time**).
 - Instead of one `Stack Frame` for each thread the `Heap` memory region has a large **shared memory with the `Stack` memory region**.
 - The `Heap` memory **grows upwards** starting from the [lower address](#low-memory-address).
-- While the program is running the `Heap` memory region **grows** automatically if the allocated memory is not enough and **shrinks** if intentionally requested.
+- While the program is running the `Heap` memory region **grows automatically** if the allocated memory is not enough and **shrinks if dropped** (calling the `drop()` method early or when the function ends).
   > To optimize the amount of system calls to a minimum you can try to allocate all the memory at once in one `Vec` with enough capacity **if you know how much memory your program needs beforehand**.
 - The `Heap` is **not stored** inside the binary and is discarded after the program execution.
 - Its size limit is bounded by the system's memory.

@@ -102,7 +102,7 @@ fn double(n: i32) -> i32 {
 
 # [STACK](#stack) Properties
 
-- The `Stack` is a **static memory** that requires a **fixed known size** at compile time and is stored inside the binary after compilation.
+- The `Stack` is a **static memory** that requires a **fixed known size** at compile time.
 - The `Stack` memory **grows downwards** starting from a [higher address](#high-memory-address) of around `0x7fffffffffff`.
 - It is an **abstraction concept** that creates **processes/threads** and is very common to find in almost every program.
 - Each process starts a **single thread by default** and each process has its **own separate stack**.

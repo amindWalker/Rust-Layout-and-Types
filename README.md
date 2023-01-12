@@ -239,11 +239,11 @@ fn boxed_value() -> Box<i32> {
 | --------------------------------------------- |
 | <div align=center>()</div>                    |
 
-| <h4>&nbsp;[ENUM TYPE](#enum-type)&nbsp;</h4> |
-| -------------------------------------------- |
-| <div align=center>Color</div>                |
-
 | <h4>&nbsp;[STRUCT TYPE](#struct-type)&nbsp;</h4> |
+| -------------------------------------------- |
+| <div align=center>Color { r: u8, g: u8, b: u8 }</div>                |
+
+| <h4>&nbsp;[ENUM TYPE](#enum-type)&nbsp;</h4> |
 | ------------------------------------------------ |
 | <div align=center>Point</div>                    |
 | <div align=center>Point::new(0, 0)</div>         |

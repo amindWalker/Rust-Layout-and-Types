@@ -245,8 +245,7 @@ fn boxed_value() -> Box<i32> {
 
 | <h4>&nbsp;[ENUM TYPE](#enum-type)&nbsp;</h4> |
 | ------------------------------------------------ |
-| <div align=center>Point</div>                    |
-| <div align=center>Point::new(0, 0)</div>         |
+| <div align=center>Polygon::Triangle</div>         |
 
 | <h4>&nbsp;[REFERENCE TYPE](#reference-type)&nbsp;</h4> |
 | ------------------------------------------------------ |

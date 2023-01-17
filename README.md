@@ -6,19 +6,11 @@
 
 Detailing the Memory Layout behind the Rust Language
 
-<br><br><br>
+<br>
+<br>
+<br>
 
 </div>
-
-## Rust Memory Layout Brief
-
-- In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
-
-- The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
-
-- The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>`, `Arc<T>`... these pointers **automatically** handle the **allocation** and **deallocation** of memory on the heap, as well as other features like **thread-safety** and **reference counting**.
-
-- In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
 
 ## The Kernel Virtual Memory Space
 - The kernel virtual memory space is the portion of virtual memory that is reserved for the use of the operating system's kernel. The virtual memory system is a memory management feature that allows the operating system to **abstract the physical memory** of a computer and present it to applications as if it were one large, **continuous block of memory**.
@@ -86,7 +78,48 @@ Detailing the Memory Layout behind the Rust Language
   </tr>
 </table>
 
-<br><br><br>
+<br>
+<br>
+<br>
+
+## Rust Memory Layout Brief
+
+- In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
+
+- The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
+
+- The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>`, `Arc<T>`... these pointers **automatically** handle the **allocation** and **deallocation** of memory on the heap, as well as other features like **thread-safety** and **reference counting**.
+
+- In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
+
+```mermaid
+stateDiagram
+  direction TB
+  HMA: HIGH MEMORY ADDRESS
+  state HMA {
+    SF: STACK FRAME
+    state SF {
+      fn: main()
+      fn --> STACK
+      STACK --> fn
+    }
+  }
+    
+  MEM: FREE MEMORY
+  HMA --> MEM
+  MEM --> HMA
+
+  LMA: LOW MEMORY ADDRESS
+  LMA --> MEM
+  MEM --> LMA
+  state LMA {
+    state HEAP {
+      direction BT
+      Pointers --> [*]
+      ... --> [*]
+    }
+  }
+```
 
 # The [STACK](#stack)
 

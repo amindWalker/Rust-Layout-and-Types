@@ -10,6 +10,25 @@ Detailing the Memory Layout behind the Rust Language
 
 </div>
 
+## Rust Memory Layout Brief
+
+- In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
+
+- The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
+
+- The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>`, `Arc<T>`... these pointers **automatically** handle the **allocation** and **deallocation** of memory on the heap, as well as other features like **thread-safety** and **reference counting**.
+
+- In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
+
+## The Kernel Virtual Memory Space
+- The kernel virtual memory space is the portion of virtual memory that is reserved for the use of the operating system's kernel. The virtual memory system is a memory management feature that allows the operating system to **abstract the physical memory** of a computer and present it to applications as if it were one large, **continuous block of memory**.
+
+- In the kernel virtual memory space, the operating system keeps track of memory pages that are currently in use by the kernel, as well as pages that are available for use by applications. The kernel also uses this space to **map certain physical memory addresses to virtual memory addresses**, so that it can access hardware devices and other system resources.
+
+- The kernel virtual memory space is typically divided into several regions, each with a specific purpose. For example, one region may be used to store the kernel code and data, while another region may be used for memory-mapped I/O.
+
+- The kernel also uses virtual memory to implement **memory protection**, which prevents applications from **accessing memory that they should not be able to access**, such as the memory of other applications or the kernel itself. This is done by setting up memory pages with specific access permissions, such as **read-only** or **read-write**.
+
 <table width="100%">
   <tr>
   <td width="20%" align=center>

@@ -336,11 +336,17 @@ std::sync::Once         ⮑ static START: Once = Once::new();
 
 # [TYPE Properties](#type-properties)
 
+## [`char`](#char)
 * The size of a `char` in `Rust` depends on the platform it is run on. On most platforms, it is **4 bytes**, but on some platforms it can be **2 bytes or even 1 byte**.
+## [`Tuple`](#tuple)
 * Tuple types can store multiple values of different types in memory. The size of the tuple is equal to the sum of the sizes of its components, **rounded up to the nearest multiple of the largest alignment** of its components. The remaining space in a tuple **may or may not be filled with padding**, depending on the platform and the components of the tuple.space (use the `std::mem::size_of::<T>()` and `std::mem::align_of::<T>()` to check the size and alignment of types).
+## [`Array`](#array)
 * **Arrays** in `Rust` have a **known fixed size**. They can store multiple values of the same type in memory.
+## [`Floating point`](#floating-point)
 * **Floating point numbers** are stored in **IEEE 754** format and their sizes are **4 bytes** for `f32` and **8 bytes** for `f64`.
+## [`bool`](#bool)
 * **Booleans** in `Rust` are stored as a single byte, but they typically take up more than 1 byte due to alignment constraints.
+## [`Vec`](#vec)
 * **Vectors** in `Rust` are **dynamic arrays** that can grow and shrink as needed. They are stored on the heap. The size of a vector **is not known at compile time**, but it is stored in the heap along with the values it contains. The **vector itself is stored in a pointer on the stack**, and this pointer **takes up a machine word**.
 
 <div align=center>
@@ -358,20 +364,29 @@ std::sync::Once         ⮑ static START: Once = Once::new();
 >
 > When the `Vector` overeaches its capacity, it will allocate a new chunk of memory on the heap using `malloc`, copying the old values to the new memory, and then update the pointer to the new memory location.
 
+## [`String`](#string)
 * `Strings` are similar to `Vectors`, but they are stored on the Heap as a **sequence of UTF-8 encoded bytes** and as a result, you cannot access individual characters using indexing. To access characters in a `String` reliably, use substring slicing `&[..]` to return a `&str`. A `&str` is stored on the stack and has a `static lifetime`, meaning it will persist throughout the entire lifetime of the program.
+## [`Struct`](#struct)
 * `Struct` comes in three forms: `Struct` with named fields, tuple-like `Struct`, and unit-like `Struct`. Tuple-like and named-field Structs behave similarly to a Tuple, but they provide more meaningful information, making your code more organized. Unit-like Structs do not hold any data and are useful for categorizing without using memory.
+## [`Enum`](#enum)
 * The `Enum` type has fields known as `variants`. If a variant doesn't hold any data, it is stored in the stack as a sequence of integers starting from 0. `Enums` with variant data have their **size defined by the largest variant**, and this **size is used for all variants**. To minimize memory usage, you can **wrap the largest variant in a `Box<T>`**, which acts as a buffer to stream data from the Heap to the Stack. The `Option` `Enum` benefits from using `Box<T>` as `None` is stored as `0` and `Some` points to the data, without integer tags, making it more memory efficient.
 
 ## [REFERENCE AND SLICES](#reference-and-slices)
 
+## [`Reference`](#Reference)
 * The `Reference` type is a `pointer` (8 or 4 bytes, depending on the operating system) to a type that is allocated either on the Stack or the Heap memory region. It is stored on the Stack and is represented by the `&T` syntax. It only **borrows** data and **never owns it like smart pointers** do.
 * The `Slice` type is a view of an `Array` or `Vector` that can only be read. It acts like a pointer, but unlike a raw pointer, it *has an associated length* and is represented by the syntax `&[T]`. `Strings` can also be sliced using the Slice type, becoming a *String Slice* or `&str`, and stored on the Stack.
 
 
 ## [SMART POINTERS](#smart-pointers)
 
+## [`Box`](#box)
 * `Box<T>` is a smart pointer that stores data on the heap memory region and provides ownership of the data it points to. **It's memory efficient and especially useful for storing recursive** types (unknown at compile time) because it only needs a **single pointer** on the stack. `Box<T>` can be either mutable or immutable.
+## [`Rc`](#rc)
 * `Rc<T>` (Reference Counting) is a `single-thread` smart pointer that provides shared ownership (multiple immutable references) of the same value on the heap. It **increases the reference count** of the data it points to when `clone()` is called, and decreases the count when all references go out of scope. `Rc<T>` **does not deep copy** values when `clone()` is called, making it faster than other types that use the `clone()` method.
+## [`RefCell`](#refcell)
 * `RefCell<T>` is a `single-thread` smart pointer that provides mutability of the data it points to, while still **enforcing borrowing rules at runtime**. `RefCell<T>` uses runtime analysis to enforce the rules and therefore it is not `thread-safe`. It is used to **bypass the compile-time enforcement** of borrowing rules, but it should only be used when you are confident that the code does not break the program. `RefCell<T>` is commonly used in combination with another smart pointer like `Rc<T>`.
+## [`Arc`](#arc)
 * `Arc<T>` (Atomic Reference Counting) is a smart pointer that provides shared ownership of the same value, allowing multiple references to the data to be **used across multiple threads**. `Arc<T>` **does not allow mutability by default**, but it can be enabled by wrapping the data in a `Mutex`. To write to the data, it needs to be locked using `Mutex::lock()` and unlocked using `Mutex::unlock()`. Sharing ownership across multiple threads **involves performance penalties**, and it is **not recommended** to use `Arc<T>` unless there is a specific need for it.
+## [`Trait Object`](#trait-object)
 * `Trait Objects` are references to a `trait` type that are often found inside smart pointers and have syntax like `&mut dyn Trait`. The `dyn` keyword indicates that the size of the object is dynamic. `Trait Objects` act like **fat pointers**, and they have **two machine words: a data pointer and a virtual table (or vtable)** that contains the methods for the trait.

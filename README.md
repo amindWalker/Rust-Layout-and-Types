@@ -13,13 +13,13 @@ Detailing the Memory Layout behind the Rust Language
 </div>
 
 ## The Kernel Virtual Memory Space
-- The kernel virtual memory space is the portion of virtual memory that is reserved for the use of the operating system's kernel. The virtual memory system is a memory management feature that allows the operating system to **abstract the physical memory** of a computer and present it to applications as if it were one large, **continuous block of memory**.
+- Kernel virtual memory is the segment of virtual memory reserved for the operating system kernel. The virtual memory system, a memory management feature, allows the operating system to present the computer's physical memory to applications as a large and **contiguous block of memory**.
 
-- In the kernel virtual memory space, the operating system keeps track of memory pages that are currently in use by the kernel, as well as pages that are available for use by applications. The kernel also uses this space to **map certain physical memory addresses to virtual memory addresses**, so that it can access hardware devices and other system resources.
+- In the kernel's virtual memory, the operating system **keeps track of the memory pages that are currently being used** by the kernel and those that are available for use by applications. It also **maps physical memory addresses to virtual memory addresses to access hardware devices** and other system resources.
 
-- The kernel virtual memory space is typically divided into several regions, each with a specific purpose. For example, one region may be used to store the kernel code and data, while another region may be used for memory-mapped I/O.
+- The kernel's virtual memory is usually divided into different regions, each of which serves a specific purpose. For example, one region might be used to **store kernel code and data**, while another might be used for **memory-mapped I/O**.
 
-- The kernel also uses virtual memory to implement **memory protection**, which prevents applications from **accessing memory that they should not be able to access**, such as the memory of other applications or the kernel itself. This is done by setting up memory pages with specific access permissions, such as **read-only** or **read-write**.
+- Virtual memory also allows the kernel to implement **memory protection**, which prevents applications from accessing memory they should not, such as that of other applications or the kernel. This is achieved by setting pages of memory with **specific access permissions**, such as **read-only** or **read-write**.
 
 <table width="100%">
   <tr>
@@ -57,22 +57,22 @@ Detailing the Memory Layout behind the Rust Language
 ### Basic x86-64 Linux ELF Binary
 
 - The memory address range is bounded by the `word` size of the `CPU`.
-- In a **64-bits** processor the `word` size is **64 ÷ 8 or 8 bytes**.
+- In a **64-bits** processor, the `word` size is **64 bits or 8 bytes per word**.
 - A **32-bits** processor can only address up to **2^32 or ~4GB** of [byte-addressable](https://en.wikipedia.org/wiki/Byte_addressing) memory. On the other hand **64-bits** processor can address from **0 to 2^64-1 or 16 billion GB**. Filling up the total memory is equivalent to turn every **0 bit into 1**
-- On **64-bits** `CPU` only **48-bits or ~281TB** is used for memory addressing with the remaining **16 bits** of the virtual address required to be all 0's or all 1's.
+- On **64-bits** `CPU` only **48-bits or ~281TB** is used for memory addressing with the remaining **16 bits** of the virtual address required to be all 0's or all 1's On a `64-bits CPU`, only **48 bits** or **256 TB** of memory addressing is supported, with the **remaining 16 bits** of the virtual address required to be either **all 0's or all 1's**.
 - Using the above as reference only **1-bit** is used for `kernelspace` and the rest is used for `userspace` memory.
 
 # [Text Segment](#text-segment)
 
-- The text segment, aka **code segment**, is where the **Rust** code is compiled by LLVM into machine code and then execute instructions
+- The text segment, aka the **code segment**, is where the `Rust` code is compiled by `LLVM` into `machine code` and **stored for later execution**. The actual execution of the machine code instructions typically occurs elsewhere in memory.
 
 # [Data Segment](#data-segment)
 
-- The data segment contains the initalized variables
+- The data segment in a program's memory layout is used to store **initialized variables**, which have a **defined value at runtime**.
 
 # [BSS](#bss)
 
-- The Block Started by Symbol (BSS) contains the unitialized variables
+- The Block Started by Symbol (BSS) section contains the uninitialized variables.
 
   </td>
   </tr>
@@ -88,7 +88,7 @@ Detailing the Memory Layout behind the Rust Language
 
 - The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
 
-- The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>`, `Arc<T>`... these pointers **automatically** handle the **allocation** and **deallocation** of memory on the heap, as well as other features like **thread-safety** and **reference counting**.
+- The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>` and `Arc<T>`. It is important to note that the smart pointers, like `Rc<T>` and `Arc<T>`, **do not automatically handle the allocation and deallocation of memory on the heap**. Instead, they do **reference counting**, which helps **manage the lifecycle of the memory allocation on the heap**.
 
 - In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
 
@@ -154,14 +154,14 @@ fn double(n: i32) -> i32 {
 
 # [STACK](#stack) Properties
 
-- The `Stack` is a **static memory** that requires a **fixed known size** at compile time.
-- The `Stack` memory **grows downwards** starting from a [higher address](#high-memory-address) of around `0x7fffffffffff`.
-- It is an **abstraction concept** that creates **processes/threads** and is very common to find in almost every program.
-- Each process starts a **single thread by default** and each process has its **own separate stack**.
-- Rust `Stack` size limit is **8MB** in a **64-bit** system but the default **start size is 2MB**.
-- If your execution exceeds the stack limit you will be confronted with a **"stack overflow"** compile error.
-- The stack **pointer size** is determined by its **data type**. In this case `i32` needs **4 bytes** and `i64` needs **8 bytes**.
-- Because of its **static** nature it doesn't need any additional step to change its size using system calls which **speeds up the execution**.
+- The **stack** is a region of memory that operates in a **last-in, first-out (LIFO)** manner, and is used to store **temporary data for function calls and other operations**.
+- The **stack** memory grows **towards lower memory addresses**, starting from a [higher address](#high-memory-address) of about `0x7fffffffffff`.
+- It is an **abstraction concept** that is used to create **processes/threads** in an operating system, and is commonly found in most programs.
+- Each process starts a **single thread by default** and each process has its **own separate stack**. Each process typically starts with a **single thread**, and **each thread has its own separate stack**.
+- The **default stack size** in a 64-bit Rust program is 2MB, but it can grow up to a **limit of 8MB**.
+- If your program **exceeds the stack size limit**, you may encounter a **"stack overflow" error**.
+- The size of the `stack pointer` is determined by its data type. For example, a `i32` requires **4 bytes**, and a `i64` requires **8 bytes**.
+- Because the stack is statically allocated, it **does not need to be resized using system calls during runtime, which can make execution faster**.
 
   </td>
   </tr>
@@ -169,13 +169,13 @@ fn double(n: i32) -> i32 {
 
 🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
 
-1.  A `Stack Frame` is created and a **stack pointer increases by 8 bytes (for a 64-bit OS)** to keep track of the running program. The `main()` has a local variable `a` which is a `i32` so its `4 bytes` in size to be reserved in its `Stack Frame`.
+1. A `stack frame` is created for the `main()` function and the `stack pointer` is updated to point to the **new stack frame**. The local variable `a` is stored in the **stack frame and takes up 4 bytes of memory**.
 
-2.  Next the variable `b` calls the function `double()` which creates another `Stack Frame` and the **\*stack pointer increases 8 bytes** in its own `Stack Frame`.
+2. When the variable `b` calls the function `double()`, a **new stack frame is created for the `double()` function**. The stack pointer is updated to point to the new stack frame, but the **change in the stack pointer depends on the size of the function arguments and local variables**.
 
-3.  In `double()` function the parameter `n` is a `i32` so it needs another `4 bytes` to be added on its own `Stack Frame`. The `double()` function has a **return address** to be stored in the variable `b` inside `main()` and it`s a `i32`so another`4 bytes`added. The function is terminated and the **stack pointer decreases 8 bytes** deallocating`double()` to be **overwritten by another function in the future**.
+3. The parameter `n` is stored in the stack frame for the `double()` function and takes up 4 bytes of memory. The **return address is stored in the stack**, and its size **depends on the architecture** of the system and the operating system.
 
-4.  The **stack pointer** goes back to `main()` function and the variable `b` **receives the value returned** from `double()`, the `main()` function ends and the whole program terminates.
+4. The `double()` function terminates and the operating system **deallocates the stack frame for the `double()` function**. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable `b` in the `main()` function. The `main()` function ends and the whole program terminates.
 
 <br><br><br>
 

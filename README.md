@@ -240,9 +240,7 @@ fn boxed_value() -> Box<i32> {
 
 # [DATA TYPES](#data-types)
 
-  <table width="100%">
-  <tr>
-  <td width="20%">
+
 
 ```rust
 DATA TYPE | EXAMPLE
@@ -276,6 +274,8 @@ reference ⮑ let data: &i32 = &1;
 Vec       ⮑ let data: Vec<i32> = vec![1, 2, 3];
 String    ⮑ let data: String = String::from("hello");
 
+
+
 SMART POINTER | EXAMPLE
 ------------- | ------------------------------------------------------
 Box<T>        ⮑ let data: Box<i32> = Box::new(5);
@@ -284,6 +284,8 @@ Weak<T>       ⮑ let data: Weak<i32> = Weak::downgrade(&rc_type);
 Arc<T>        ⮑ let data: Arc<i32> = Arc::new(5);
 RefCell<T>    ⮑ let data: RefCell<i32> = RefCell::new(5);
 Cell<T>       ⮑ let data: RefCell<Cell<i32>> = RefCell::new(Cell::new(5));
+
+
 
 ASYNC TYPE           | EXAMPLE
 -------------------- | ------------------------------------------------------
@@ -298,16 +300,23 @@ Task                 ⮑ let task: Task = tokio::spawn(async {});
 Context              ⮑ let context: Context = &mut Context::from_waker(waker);
 Waker                ⮑ let waker: Waker = noop_waker();
 
-CONCURRENCY TYPE        | EXAMPLE
+
+
+CONCURRENCY + ASYNC     | EXAMPLE
 ----------------------- | ---------------------------------------------------
 std::thread             ⮑ thread::spawn( move || { })
 std::sync::mpsc         ⮑ let (tx, rx) = mpsc::channel();
 std::thread::JoinHandle ⮑ let handle = std::thread::spawn(move || {});
                            handle.join();
+tokio::task::JoinHandle ⮑ let handle = tokio::spawn(async {});
+                           handle.await.unwrap();
 std::sync::Arc          ⮑ let arc = Arc::new(vec![1, 2, 3]);
                            let arc_clone = arc.clone();
 std::sync::Mutex        ⮑ let mutex = Mutex::new(0);
                            let mut guard = mutex.lock().unwrap();
+                           *guard = 1;
+tokio::sync::Mutex      ⮑ let mutex = Mutex::new(0);
+                           let mut guard = mutex.lock().await;
                            *guard = 1;
 std::sync::RwLock       ⮑ let rwlock = RwLock::new(0);
                            let mut guard = rwlock.write().unwrap();
@@ -322,19 +331,10 @@ std::sync::Condvar      ⮑ let pair = Mutex::new((0, Condvar::new()));
 std::sync::Once         ⮑ static START: Once = Once::new();
                            START.call_once(|| initialize());
                            START.call_once(|| println!("This will not run"));
-tokio::task::JoinHandle ⮑ let handle = tokio::spawn(async {});
-                           handle.await.unwrap();
-tokio::sync::Mutex      ⮑ let mutex = Mutex::new(0);
-                           let mut guard = mutex.lock().await;
-                           *guard = 1;
-
 ```
 
-  </td>
 
-  <td width="80%">
-
-# [TYPE](#type) Properties
+# [TYPE Properties](#type-properties)
 
 * The size of a `char` in `Rust` depends on the platform it is run on. On most platforms, it is **4 bytes**, but on some platforms it can be **2 bytes or even 1 byte**.
 * Tuple types can store multiple values of different types in memory. The size of the tuple is equal to the sum of the sizes of its components, **rounded up to the nearest multiple of the largest alignment** of its components. The remaining space in a tuple **may or may not be filled with padding**, depending on the platform and the components of the tuple.space (use the `std::mem::size_of::<T>()` and `std::mem::align_of::<T>()` to check the size and alignment of types).
@@ -362,7 +362,7 @@ tokio::sync::Mutex      ⮑ let mutex = Mutex::new(0);
 * `Struct` comes in three forms: `Struct` with named fields, tuple-like `Struct`, and unit-like `Struct`. Tuple-like and named-field Structs behave similarly to a Tuple, but they provide more meaningful information, making your code more organized. Unit-like Structs do not hold any data and are useful for categorizing without using memory.
 * The `Enum` type has fields known as `variants`. If a variant doesn't hold any data, it is stored in the stack as a sequence of integers starting from 0. `Enums` with variant data have their **size defined by the largest variant**, and this **size is used for all variants**. To minimize memory usage, you can **wrap the largest variant in a `Box<T>`**, which acts as a buffer to stream data from the Heap to the Stack. The `Option` `Enum` benefits from using `Box<T>` as `None` is stored as `0` and `Some` points to the data, without integer tags, making it more memory efficient.
 
-## [REFERENCE](#reference) and [SLICE](#slice) Type
+## [REFERENCE AND SLICES](#reference-and-slices)
 
 * The `Reference` type is a `pointer` (8 or 4 bytes, depending on the operating system) to a type that is allocated either on the Stack or the Heap memory region. It is stored on the Stack and is represented by the `&T` syntax. It only **borrows** data and **never owns it like smart pointers** do.
 * The `Slice` type is a view of an `Array` or `Vector` that can only be read. It acts like a pointer, but unlike a raw pointer, it *has an associated length* and is represented by the syntax `&[T]`. `Strings` can also be sliced using the Slice type, becoming a *String Slice* or `&str`, and stored on the Stack.
@@ -375,8 +375,3 @@ tokio::sync::Mutex      ⮑ let mutex = Mutex::new(0);
 * `RefCell<T>` is a `single-thread` smart pointer that provides mutability of the data it points to, while still **enforcing borrowing rules at runtime**. `RefCell<T>` uses runtime analysis to enforce the rules and therefore it is not `thread-safe`. It is used to **bypass the compile-time enforcement** of borrowing rules, but it should only be used when you are confident that the code does not break the program. `RefCell<T>` is commonly used in combination with another smart pointer like `Rc<T>`.
 * `Arc<T>` (Atomic Reference Counting) is a smart pointer that provides shared ownership of the same value, allowing multiple references to the data to be **used across multiple threads**. `Arc<T>` **does not allow mutability by default**, but it can be enabled by wrapping the data in a `Mutex`. To write to the data, it needs to be locked using `Mutex::lock()` and unlocked using `Mutex::unlock()`. Sharing ownership across multiple threads **involves performance penalties**, and it is **not recommended** to use `Arc<T>` unless there is a specific need for it.
 * `Trait Objects` are references to a `trait` type that are often found inside smart pointers and have syntax like `&mut dyn Trait`. The `dyn` keyword indicates that the size of the object is dynamic. `Trait Objects` act like **fat pointers**, and they have **two machine words: a data pointer and a virtual table (or vtable)** that contains the methods for the trait.
-
-
-  </td>
-  </tr>
-</table>

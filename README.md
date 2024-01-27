@@ -13,14 +13,11 @@ Detailing the Memory Layout behind the Rust Language
 </div>
 
 ## The Kernel Virtual Memory Space
-
--   Kernel virtual memory is the segment of virtual memory reserved for the operating system kernel. The virtual memory system, a memory management feature, allows the operating system to present the computer's physical memory to applications as a large and **contiguous block of memory**.
-
--   In the kernel's virtual memory, the operating system **keeps track of the memory pages that are currently being used** by the kernel and those that are available for use by applications. It also **maps physical memory addresses to virtual memory addresses to access hardware devices** and other system resources.
-
--   The kernel's virtual memory is usually divided into different regions, each of which serves a specific purpose. For example, one region might be used to **store kernel code and data**, while another might be used for **memory-mapped I/O**.
-
--   Virtual memory also allows the kernel to implement **memory protection**, which prevents applications from accessing memory they should not, such as that of other applications or the kernel. This is achieved by setting pages of memory with **specific access permissions**, such as **read-only** or **read-write**.
+> [!NOTE]
+> - Kernel virtual memory is the segment of virtual memory reserved for the operating system kernel. The virtual memory system, a memory management feature, allows the operating system to present the computer's physical memory to applications as a large and **contiguous block of memory**.
+> - In the kernel's virtual memory, the operating system **keeps track of the memory pages that are currently being used** by the kernel and those that are available for use by applications. It also **maps physical memory addresses to virtual memory addresses to access hardware devices** and other system resources.
+> - The kernel's virtual memory is usually divided into different regions, each of which serves a specific purpose. For example, one region might be used to **store kernel code and data**, while another might be used for **memory-mapped I/O**.
+> - Virtual memory also allows the kernel to implement **memory protection**, which prevents applications from accessing memory they should not, such as that of other applications or the kernel. This is achieved by setting pages of memory with **specific access permissions**, such as **read-only** or **read-write**.
 
 <table width="100%">
   <tr>
@@ -84,14 +81,11 @@ Detailing the Memory Layout behind the Rust Language
 <br>
 
 ## Rust Memory Layout Brief
-
--   In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
-
--   The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
-
--   The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>` and `Arc<T>`. It is important to note that the smart pointers, like `Rc<T>` and `Arc<T>`, **do not automatically handle the allocation and deallocation of memory on the heap**. Instead, they do **reference counting**, which helps **manage the lifecycle of the memory allocation on the heap**.
-
--   In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
+> [!NOTE]
+> - In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
+> - The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
+> - The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>` and `Arc<T>`. It is important to note that the smart pointers, like `Rc<T>` and `Arc<T>`, **do not automatically handle the allocation and deallocation of memory on the heap**. Instead, they do **reference counting**, which helps **manage the lifecycle of the memory allocation on the heap**.
+> - In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
 
 ```mermaid
 stateDiagram
@@ -124,9 +118,9 @@ stateDiagram
 
 # The [STACK](#stack)
 
-> SAMPLE FUNCTION
-
 ```rust
+/// Sample function
+
 fn main() {
   let a = 48;
   let b = double(a);
@@ -168,23 +162,20 @@ fn double(n: i32) -> i32 {
   </tr>
 </table>
 
-🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
-
-1. A `stack frame` is created for the `main()` function and the `stack pointer` is updated to point to the **new stack frame**. The local variable `a` is stored in the **stack frame and takes up 4 bytes of memory**.
-
-2. When the variable `b` calls the function `double()`, a **new stack frame is created for the `double()` function**. The stack pointer is updated to point to the new stack frame, but the **change in the stack pointer depends on the size of the function arguments and local variables**.
-
-3. The parameter `n` is stored in the stack frame for the `double()` function and takes up 4 bytes of memory. The **return address is stored in the stack**, and its size **depends on the architecture** of the system and the operating system.
-
-4. The `double()` function terminates and the operating system **deallocates the stack frame for the `double()` function**. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable `b` in the `main()` function. The `main()` function ends and the whole program terminates.
+> [!IMPORTANT]
+> 🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
+> 1. A `stack frame` is created for the `main()` function and the `stack pointer` is updated to point to the **new stack frame**. The local variable `a` is stored in the **stack frame and takes up 4 bytes of memory**.
+> 2. When the variable `b` calls the function `double()`, a **new stack frame is created for the `double()` function**. The stack pointer is updated to point to the new stack frame, but the **change in the stack pointer depends on the size of the function arguments and local variables**.
+> 3. The parameter `n` is stored in the stack frame for the `double()` function and takes up 4 bytes of memory. The **return address is stored in the stack**, and its size **depends on the architecture** of the system and the operating system.
+> 4. The `double()` function terminates and the operating system **deallocates the stack frame for the `double()` function**. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable `b` in the `main()` function. The `main()` function ends and the whole program terminates.
 
 <br><br><br>
 
 # The [HEAP](#heap)
 
-> SAMPLE FUNCTION
-
 ```rust
+/// Sample function
+
 fn main() {
   let heap = boxed_value();
   println!("{heap}");
@@ -230,13 +221,11 @@ fn boxed_value() -> Box<i32> {
   </tr>
 </table>
 
-🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
-
-1.  The `main()` function creates a new `Stack Frame`. The **stack pointer increases 8 bytes** and the variable `Heap` calls the function `boxed_value()`.
-
-2.  The `boxed_value()` **stack pointer increases 8 bytes again** and we also have a local variable called `result` that has a `Box` with a value inside. The **`Box` acts as a pointer** so the return value size is **8 bytes** as well (the `Heap` variable in `main()` will be the same **8 bytes but as an address pointing to the `Heap Memory`**). Inside the `Box` we have a `99` value which is an `i32` so we need to reserve **4 bytes but this time on the heap**. The function ends, **deallocates and decreases the stack pointer by 8 bytes**.
-
-3.  The **pointer** goes back to the `main()` and the **heap variable** now receives a **copied address** of the value stored in the shared `Heap Memory`. Finally the function runs and terminates the program.
+> [!IMPORTANT]
+> 🦀 **Depicting the sample function memory allocation in a 64-bit OS:**
+> 1.  The `main()` function creates a new `Stack Frame`. The **stack pointer increases 8 bytes** and the variable `Heap` calls the function `boxed_value()`.
+> 2.  The `boxed_value()` **stack pointer increases 8 bytes again** and we also have a local variable called `result` that has a `Box` with a value inside. The **`Box` acts as a pointer** so the return value size is **8 bytes** as well (the `Heap` variable in `main()` will be the same **8 bytes but as an address pointing to the `Heap Memory`**). Inside the `Box` we have a `99` value which is an `i32` so we need to reserve **4 bytes but this time on the heap**. The function ends, **deallocates and decreases the stack pointer by 8 bytes**.
+> 3.  The **pointer** goes back to the `main()` and the **heap variable** now receives a **copied address** of the value stored in the shared `Heap Memory`. Finally the function runs and terminates the program.
 
 # [DATA TYPES](#data-types)
 

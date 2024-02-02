@@ -4,7 +4,7 @@
 
 # Rust Memory Layout and Types
 
-Detailing the Memory Layout behind the Rust Language
+Learn Rust's Memory Layout and its Types by looking in detail at what happens behind the language.
 
 <br>
 <br>

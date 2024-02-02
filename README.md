@@ -2,7 +2,7 @@
 
   <img src='https://user-images.githubusercontent.com/66398400/169051355-edd50385-e66d-4255-a6ef-e60581b30019.gif'/>
 
-# Rust Memory Layout
+# Rust Memory Layout and Types
 
 Detailing the Memory Layout behind the Rust Language
 

@@ -84,7 +84,7 @@ Learn Rust's Memory Layout and its Types by looking in detail at what happens be
 > [!NOTE]
 > - In Rust, memory is organized into `stack`, `heap` and a special `static` memory region.
 > - The `stack` is a region of memory that stores **local variables** and **function call frames**. It is fast, but has a fixed size. When a function is called, a new frame is **pushed onto the stack**, and when the function returns, the **frame is popped off**.
-> - The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>` and `Arc<T>`. It is important to note that the smart pointers, like `Rc<T>` and `Arc<T>`, **do not automatically handle the allocation and deallocation of memory on the heap**. Instead, they do **reference counting**, which helps **manage the lifecycle of the memory allocation on the heap**.
+> - The **heap**, on the other hand, is a region of memory that can be **dynamically allocated and deallocated at runtime**. It is slower to access than the stack, but it can **grow** or **shrink** as needed. In Rust, heap-allocated memory is managed through the use of `smart pointers`, such as `Box<T>`, `Rc<T>` and `Arc<T>`. It is important to note that the smart pointers, like `Rc<T>` and `Arc<T>`, **do not automatically handle the allocation and deallocation of memory on the heap**. Instead, they do **reference counting**, which helps manage the **lifecycle of the memory allocation on the heap**.
 > - In addition, Rust also has the concept of **"static variables"** which are stored in a **special** region of memory called the **static data segment**, which is a part of the **program's binary** and it's stored in the **read-only memory**. These variables have the **same lifetime as the program** and they are not bound to a specific scope.
 
 ```mermaid
@@ -150,7 +150,7 @@ fn double(n: i32) -> i32 {
 # [STACK](#stack) Properties
 
 -   The **stack** is a region of memory that operates in a **last-in, first-out (LIFO)** manner, and is used to store **temporary data for function calls and other operations**.
--   The **stack** memory grows **towards lower memory addresses**, starting from a [higher address](#high-memory-address) of about `0x7fffffffffff`.
+-   The **stack** memory grows **towards lower memory addresses (or downwards)**, starting from a [higher address](#high-memory-address) of about `0x7fffffffffff`.
 -   It is an **abstraction concept** that is used to create **processes/threads** in an operating system, and is commonly found in most programs.
 -   Each process starts a **single thread by default** and each process has its **own separate stack**. Each process typically starts with a **single thread**, and **each thread has its own separate stack**.
 -   The **default stack size** in a 64-bit Rust program is 2MB, but it can grow up to a **limit of 8MB**.
@@ -205,16 +205,16 @@ fn boxed_value() -> Box<i32> {
 
 # [HEAP](#heap) Properties
 
--   The `Heap` is another abstraction that, unlike `Stack`, has a **flexible size** that can change over time (like in **run time**).
+-   The `Heap` is another abstraction that, unlike `Stack`, has a **flexible size** that can change over time (like in **runtime**).
 -   Instead of one `Stack Frame` for each thread the `Heap` memory region has a large **shared memory with the `Stack` memory region**.
--   The `Heap` memory **grows upwards** starting from the [lower address](#low-memory-address).
+-   The `Heap` memory **towards higher memory addresses (or upwards)** starting from the [lower address](#low-memory-address).
 -   While the program is running the `Heap` memory region **grows automatically** if the allocated memory is not enough and **shrinks if dropped** (calling the `drop()` method early or when the function ends).
     > To optimize the amount of system calls to a minimum you can try to allocate all the memory at once in one `Vec` with enough capacity **if you know how much memory your program needs beforehand**.
 -   The `Heap` is **not stored** inside the binary and is discarded after the program execution.
 -   Its size limit is bounded by the system's memory.
 -   Each `Heap` **value size** is determined by the **data type**.
--   Because of its **dynanmic** nature it needs to make system calls to ask for more space (using the **GlobalAlloc Trait that calls C malloc**) as soon as requested thus adding a little overhead. This process is done in **chunks to make as few system calls as possible**. Even using this technique this process turns the `Heap` slower than the `Stack` memory.
--   When a variable goes out of scope (dropped) the memory is **freed but not returned immediately to the OS**. The memory allocator keeps track of the **OS memory pages** to know which pages are **free** and which are **allocated**. This process is a way to **prevent more system calls** and **reuse** the available memory without waiting for the OS thus speeding things up.
+-   Because of its **dynanmic** nature it needs to make system calls to ask for more space (using the **GlobalAlloc Trait that calls C's `malloc`**) as soon as requested thus adding a little overhead. This process is done in **chunks to make as few system calls as possible**. Even using this technique this process turns the `Heap` slower than the `Stack` memory.
+-   When a variable goes out of scope (**dropped**) the memory is **freed but not returned immediately to the OS**. The memory allocator keeps track of the **OS memory pages** to know which pages are **free** and which are **allocated**. This process is a way to **prevent more system calls** and **reuse** the available memory without waiting for the OS thus speeding things up.
 -   The access to the `Heap` is also slower than on the `Stack` because we have the additional step of **following a pointer** to the value.
 
   </td>
